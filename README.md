@@ -1,21 +1,34 @@
-# Introduction to Graph Theory for Gamedevs
+---
+documentclass: memoir
+fontsize: 14pt
+title: Introduction to Graph Theory for Gamedevs
+author: Pål Grønås Drange
+date: Summer 2025
+papersize:
+  - a4paper
+header-includes:
+  - \usepackage{microtype}
+  - \usepackage{newpx}
+  - \usepackage{froufrou}
+abstract: |
 
-## Abstract
+    This pamphlet serves to purposes.
 
-This pamphlet serves to purposes.
+    1. Introduce graph theory to teach concepts and graph structures for game
+       developers, both programmers and artistic creators.  This also entails
+       expositing some algorithms, although all algorithms mentioned herein are
+       quite simple.
 
-1. Introduce graph theory to teach concepts and graph structures for game
-   developers, both programmers and artistic creators.  This also entails
-   expositing some algorithms, although all algorithms mentioned herein are
-   quite simple.
+    2. Through structures, models, and problems from graph theory, give ideas to
+       game creators about possible games, puzzles, and also AI (bot) strategies
+       for games.  It also might explain what makes a certain graph problem easy or
+       hard.
 
-2. Through structures, models, and problems from graph theory, give ideas to
-   game creators about possible games, puzzles, and also AI (bot) strategies
-   for games.  It also might explain what makes a certain graph problem easy or
-   hard.
+---
 
+\tableofcontents
 
-## Basic graph theory and representation
+# Basic graph theory and representation
 
 A graph is a mathematical object where we have objects (abstractly called nodes
 or vertices) and relations between them.  If two objects, e.g. $v_1$ and $v_2$
@@ -52,12 +65,33 @@ the same as assuming that $c(e)= 1$ for all edges.
 
 If you want to go from $A$ to $B$ in your road network, you might want to find
 a route that is _shortest_, _fastest_, or _cheapest_.  Short means length, fast
-means length times (expected) speed, cheapest is perhaps sum of tolls.
+means length times (expected) speed, cheapest is perhaps sum of tolls.  In all
+these cases, the weight of an edge is some non-negative value.  A road segment
+cannot be a negative length, a speed limit is unlikely to be negative, and the
+tolls on a road is likely non-negative (except someone has a crate of gold to
+give you).  However, one can definitely imagine negative weights: Let the
+weight of a road segment represent the energy used by an electric vehicle (EV)
+to traverse it.  An EV uses a certain amount of energy to travel a segment,
+depending on distance and slope.  If the road is steep downhill and the EV has
+regenerative braking, it might actually _gain energy_, resulting in a
+_negative_ net energy usage for that segment.  This means that if you want to
+find a shortest path from $A$ to $B$ for an EV, you need to take into account
+battery level and slope, and perhaps your path-finding algorithm needs to
+handle negative weights---something we will see later that Dijkstra's algorithm
+does not do.
 
-Heck, maybe you can go the wrong way in a one-way street provided that the
-expectation that you get fined is low enough!
+\froufrou
 
-### Representation and prerequisites
+Ultimately, a graph is therefore---mathematically, and in code---a tuple
+consisting of the vertices $V$, the edges $E \subseteq V \times V$, sometimes a
+weight function on vertices $w: V \to \mathbb{R}$, and a weight function on
+edges $c: E \to \mathbb{R}$.  In code,
+
+```python
+G = (V, E, w)
+```
+
+## Representation and Prerequisites
 
 When representing a graph in a computer program, we could go the easy way and
 use two lists.  One list of nodes, $V$, and one list of edges $E$.  However, it
@@ -65,16 +99,121 @@ turns out that for many algorithmic purposes, this is too slow.  Instead we use
 one of two ways of representing graphs that are _adjacency list_ or _adjacency
 matrix_.
 
-#### Adjacency list
+### Adjacency List
 
-#### Adjacency matrix
+The simplest form of a graph represented in code is the adjacency list:
 
-#### Data structures?
+```python
 
-* Fibonacchi heap, priority queue?
-* Union find for MST?
+G = [
+     [b],        # a
+     [a, c, e],  # b
+     [b, d, f],  # c
+     [c, f],     # d
+     [b, f],     # e
+     [c, d, e],  # f
+]
+```
 
-## Paths, navigation, and the art of finding
+### Adjacency Matrix
+
+
+
+```python
+G = [ # a  b  c  d  e  f
+       [0, 1, 0, 0, 0, 0],  # a
+       [1, 0, 1, 0, 1, 0],  # b
+       [0, 1, 0, 1, 0, 1],  # c
+       [0, 0, 1, 0, 0, 1],  # d
+       [0, 1, 0, 0, 0, 1],  # e
+       [0, 0, 1, 1, 1, 0],  # f
+]
+```
+
+### Grid Representation
+
+Sometimes we have a very small tile world, and it might make sense to represent
+the entire graph as a simple list of characters.  Here, a `.` means an empty
+space, whereas a `#` means an obstacle.  The `S` and `T` are the start and goal
+of a maze.
+
+
+```
+####################
+#T.#.#....#...#....S
+##.###.##.###.##.###
+#..##..#..##..#..##.
+##..#.###....###....
+##....###....###.###
+##.######.###.##.###
+#..##..#..##.....##.
+#..#...#......#..#..
+####################
+```
+
+In this maze, we are allowed to move `U`, `D`, `R`, and `L`, as long as we do
+not enter an obstacle.  It is not hard to see that the following gives a path
+from `S` to `T`.  We will see in the next section how to find this path
+programatically.
+
+```
+####################
+#To#.#oooo#...#.oooS
+##o###o##o###.##o###
+#.o##oo#.o##..#.o##.
+##oo#o###o...###o...
+##.ooo###o...###o###
+##.######o###.##o###
+#..##..#.o##ooooo##.
+#..#...#.oooo.#..#..
+####################
+```
+
+
+# Paths, Navigation, and the Art of Finding
+
+## Path Finding and Mazes
+
+To illustrate the simplicity of a path finding algorithm, here is DFS:
+
+```python
+def dfs(G, u, visited=None):
+  if visited is None:
+    visited = set()
+  visited.add(u)
+  for v in G[u]:
+    if v not in visited:
+      dfs(G, v, visited)
+  return visited
+```
+
+The problem with DFS, however, is that it does not necessarily find the
+_shortest_ path, only some path.  In addition, as it is now, it is recursive,
+and that is something we want to avoid.  So instead of using DFS, we will use
+BFS for our path finding.  Here is BFS, the simplest path finding algorithm
+that finds (and returns) the shortest path from $s$ to _any other vertex_,
+together with the distance.  The running time of BFS is $O(n+m)$, meaning
+_linear time_, meaning that it essentially takes as long time to run BFS as it
+takes to read the graph.
+
+```python
+from collections import deque
+
+def bfs(G, s):
+  visited = set()
+  dist = {s: 0}
+  parent = {s: None}
+  queue = deque([s])
+  while queue:
+    u = queue.popleft()
+    for v in G[u]:
+      if v not in visited:
+        visited.add(v)
+        dist[v] = dist[u] + 1
+        parent[v] = u
+        queue.append(v)
+  return dist, parent
+```
 
 Covered in this section:
 
@@ -82,7 +221,7 @@ Covered in this section:
   * Path finding and mazes
   * flood-filling
   * puzzle solving (rubik, 15-puzzle, die hard water)
-  * planar $\sqrt n$ portals and highways
+  * planar $\sqrt n$ portals (distance oracle) and highways
   * APSP
 * Algorithms
   * BFS
@@ -92,7 +231,7 @@ Covered in this section:
   * Floyd--Warshall
   * Bellman--Ford, Johnson's algorithm
 
-## Global navigation
+# Global navigation
 
 * Problems
   * No-Lift Pencil Drawing
@@ -103,7 +242,7 @@ Covered in this section:
   * TSP
   * Longest path
 
-## Cutting and flowing
+# Cutting and flowing
 
 * Problems
   * Matching (assignment)
@@ -119,7 +258,7 @@ Covered in this section:
   * The Hungarian Method
   * Suurballe
 
-## Covering, hitting, packing
+# Covering, Hitting, and Packing
 
 * Problems
   * R-B-Dom Set, Vertex Cover, Tower defense
@@ -131,7 +270,7 @@ Covered in this section:
   * reduction rules
 
 
-## Drawing and partitioning and clustering
+# Drawing, Partitioning, and Clustering
 
 * Problems
   * Graph drawing
@@ -139,6 +278,7 @@ Covered in this section:
   * Community detection
   * Clique (?)
   * MST (connectivity and clustering)
+    * Union--find
   * Steiner tree
   * Centrality measures
   * Cascading and fire fighting, disease propagation
@@ -147,7 +287,7 @@ Covered in this section:
   * Louvain and LCA
   * Betweenness, Page rank
 
-## Geometric embeddings
+# Geometric Embeddings
 
 * Problems
   * Regions from fences (Planar dual)
@@ -159,7 +299,7 @@ Covered in this section:
     * line intersection
     * triangle and polygon containment
 
-### Interval graphs
+## Interval Graphs
 
 * Problems
   * Interval scheduling (chromatic number)
@@ -169,7 +309,10 @@ Covered in this section:
 * Algorithms
   * Greedy algorithms for interval scheduling and coloring
 
-### Dynamic graphs
+
+# What now?
+
+## Dynamic graphs
 
 Explain that **this changes everything**.
 
