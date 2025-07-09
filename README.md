@@ -174,6 +174,12 @@ programatically.
 
 ## Path Finding and Mazes
 
+Suppose that you have an AI who wants to travel from $A$ to $B$, or that _you_
+want to travel from $A$ to $B$, and you want to highlight the path on the map.
+In this case, we need to find a _path_, whatever that is, that (a) starts in
+$A$, (b) ends in $B$, and is (c) as short as possible.  There are many path
+finding algorithms, and they all serve different purposes.
+
 To illustrate the simplicity of a path finding algorithm, here is DFS:
 
 ```python
@@ -215,18 +221,122 @@ def bfs(G, s):
   return dist, parent
 ```
 
+Suppose that you have a map, and your player is in the spawn area, and wants to
+find a route to the bomb site.  As long as your world has, for each coordinate,
+a list of "neighboring cells", you can plug that directly into the `bfs`
+routine above, where $G[u]$ means the neighboring cells of $u$.  The return
+value, i.e., when we write
+
+```python
+dist, parent = bfs(world, current_location)
+```
+
+\noindent is the distance and a form of linked list leading from each vertex to
+a vertex closer to the start.
+
+### Flood Filling
+
+This algorithm can also be used as a flood filling algorithm.
+
+
+### Weighted graphs
+
+When the "cost" of moving from one "cell" to another is not the same
+everywhere; for example running in water or running uphill can be more
+expensive, we need an algorithm that can deal with these costs.  BFS can
+unfortunately not.
+
+Dijkstra's algorithm is an algorithm that works similarly to BFS, but instead
+of a queue that we iterate through, we have a _priority queue_.  A priority
+queue is a queue in which the First In First Out is replaced with "Most
+Important Out".  That is, the order of insertion is irrelevant; when we pop
+from the queue, we pop the one with highest priority (typically this is the one
+with _lowest possible value_).
+
+```python
+import heapq
+
+def dijkstra(G, s):
+  dist = {s: 0}
+  parent = {s: None}
+  visited = set()
+  heap = [(0, s)]
+
+  while heap:
+    d, u = heapq.heappop(heap)
+    if u in visited:
+      continue
+    visited.add(u)
+    for v, w in G[u]:
+      if v not in dist or d + w < dist[v]:
+        dist[v] = d + w
+        parent[v] = u
+        heapq.heappush(heap, (dist[v], v))
+
+  return dist, parent
+```
+
+
+## Puzzle Solving
+
+It is not only in the literal sense that path finding algorithms are useful.
+Consider Rubik's Cube, the 15-puzzle, or the classic Die Hard puzzle of filling
+a 5 liter bucket with 4 liters of water using only 3 and 5 liter buckets.
+
+Suppose, we want to help MacClane with his task.  Construct an abstract "state
+space graph" where you have the node set as $(c_3, c_5)$ where $c_3 \in \{0, 1,
+2, 3\}$ and $c_5 \in \{0, 1, 2, 3, 4, 5\}$.  Suppose that you have $c_3$ liters
+of water in the small bucket and $c_5$ liters of water in the large bucket.
+What can you do?  Fill one of them, i.e., the next states are $(3, c_5)$ or
+$(c_3, 5)$.  Alternatively, you can empty one of them, i.e., the next states
+are $(0, c_5$) or $(c_3, 0)$.  Finally, you can pour from one to the other
+until either pourer becomes empty or the pouree becomes full: $(\max(c_5 - c_3,
+0), \min(c_5 + c_3, 5)$, or the other way around.  How do we go from $(0,0)$ to
+$(0, 4)$?  Simply run `bfs(G, (0,0))`.
+
+However, running the 15-puzzle with BFS might take longer than necessary.  An
+algorithm $A^*$ is cool.  It is simply Dijkstra's algorithm, but with a small
+estimation of remaining distance.
+
+```python
+import heapq
+
+
+def astar(G, s, t, h):
+  dist = {s: 0}
+  parent = {s: None}
+  heap = [(h(s), s)]
+
+  while heap:
+    _, u = heapq.heappop(heap)
+    if u == t:
+      break
+    for v, w in G[u]:
+      alt = dist[u] + w
+      if v not in dist or alt < dist[v]:
+        dist[v] = alt
+        parent[v] = u
+        heapq.heappush(heap, (alt + h(v), v))
+
+  return dist, parent
+```
+
+
+## Negative Distances
+
+As mentioned above, suppose the energy usage for an EV is negative in certain
+steep downhill segments.
+
+
+
+## --- NOTES ---
+
 Covered in this section:
 
 * Problems
-  * Path finding and mazes
-  * flood-filling
-  * puzzle solving (rubik, 15-puzzle, die hard water)
   * planar $\sqrt n$ portals (distance oracle) and highways
   * APSP
 * Algorithms
-  * BFS
-  * Dijkstra's
-  * $A^*$
   * Bidirectional search
   * Floyd--Warshall
   * Bellman--Ford, Johnson's algorithm
