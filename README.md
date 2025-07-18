@@ -12,17 +12,16 @@ header-includes:
   - \usepackage{froufrou}
 abstract: |
 
-    This pamphlet serves to purposes.
+    This pamphlet serves two purposes.
 
     1. Introduce graph theory to teach concepts and graph structures for game
-       developers, both programmers and artistic creators.  This also entails
-       expositing some algorithms, although all algorithms mentioned herein are
-       quite simple.
+       developers, both programmers and artistic creators. This also entails
+       the explanation of some algorithms, although all algorithms mentioned
+       herein are relatively simple.
 
-    2. Through structures, models, and problems from graph theory, give ideas to
-       game creators about possible games, puzzles, and also AI (bot) strategies
-       for games.  It also might explain what makes a certain graph problem easy or
-       hard.
+    2. Through structures, models, and problems from graph theory, inspire game
+       creators about possible games, puzzles, and AI strategies. It may also
+       explain what makes certain graph problems easy or hard.
 
 ---
 
