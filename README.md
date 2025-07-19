@@ -1,6 +1,6 @@
 ---
 documentclass: memoir
-fontsize: 14pt
+fontsize: 13pt
 title: Introduction to Graph Theory for Gamedevs
 author: Pål Grønås Drange
 date: Summer 2025
@@ -282,7 +282,11 @@ It is not only in the literal sense that path finding algorithms are useful.
 Consider Rubik's Cube, the 15-puzzle, or the classic Die Hard puzzle of filling
 a 5 liter bucket with 4 liters of water using only 3 and 5 liter buckets.
 
-Suppose, we want to help MacClane with his task.  Construct an abstract "state
+
+### Water Jug Problem
+
+Suppose, we want to help MacClane with his task of putting 4 liters of water in a 5 liter bucket using only one 3 and one 5 liter buckets.
+Construct an abstract "state
 space graph" where you have the node set as $(c_3, c_5)$ where $c_3 \in \{0, 1,
 2, 3\}$ and $c_5 \in \{0, 1, 2, 3, 4, 5\}$.  Suppose that you have $c_3$ liters
 of water in the small bucket and $c_5$ liters of water in the large bucket.
@@ -290,22 +294,121 @@ What can you do?  Fill one of them, i.e., the next states are $(3, c_5)$ or
 $(c_3, 5)$.  Alternatively, you can empty one of them, i.e., the next states
 are $(0, c_5$) or $(c_3, 0)$.  Finally, you can pour from one to the other
 until either pourer becomes empty or the pouree becomes full: $(\max(c_5 - c_3,
-0), \min(c_5 + c_3, 5)$, or the other way around.  How do we go from $(0,0)$ to
+0), \min(c_5 + c_3, 5))$, or the other way around.  How do we go from $(0,0)$ to
 $(0, 4)$?  Simply run `bfs(G, (0,0))`.
 
-However, running the 15-puzzle with BFS might take longer than necessary.  An
-algorithm $A^*$ is cool.  It is simply Dijkstra's algorithm, but with a small
+\clearpage
+
+```python
+from collections import deque, namedtuple
+
+def bfs(s):
+  visited = set()
+  dist = {s: 0}
+  parent = {s: None}
+  queue = deque([s])
+  while queue:
+    u = queue.popleft()
+    for v in next_state(u):
+      if v not in visited:
+        visited.add(v)
+        dist[v] = dist[u] + 1
+        parent[v] = u
+        queue.append(v)
+  return dist, parent
+
+Jugs = namedtuple("Jugs", "b3 b5")
+START = Jugs(0, 0)
+GOAL = Jugs(0, 4)
+
+def next_state(state):
+  yield Jugs(0, state.b5)
+  yield Jugs(state.b3, 0)
+  yield Jugs(3, state.b5)
+  yield Jugs(state.b3, 5)
+  yield Jugs(max(state.b3 - (5 - state.b5), 0),
+             min(5, state.b3 + state.b5))
+  yield Jugs(min(3, state.b3 + state.b5),
+             max(state.b5 - (3 - state.b3), 0))
+
+def is_goal(state):
+  return state == GOAL
+
+dist, parent = bfs(START)
+current = GOAL
+solution = [GOAL]
+while (current := parent[current]) != START:
+  solution.append(current)
+solution.append(START)
+for step, state in enumerate(reversed(solution)):
+  print((1 + step), state)
+```
+
+\clearpage
+
+The above code solves the Water Jug Problem and will print the steps needed to
+take to achieve the solution.
+
+```
+1 Jugs(b3=0, b5=0)
+2 Jugs(b3=0, b5=5)
+3 Jugs(b3=3, b5=2)
+4 Jugs(b3=0, b5=2)
+5 Jugs(b3=2, b5=0)
+6 Jugs(b3=2, b5=5)
+7 Jugs(b3=3, b5=4)
+8 Jugs(b3=0, b5=4)
+```
+
+### Other Puzzles
+
+The 15-puzzle and the Rubik's cube are other examples of games where we can
+represent the state space as a graph and use a search algorithm for finding the
+shortest path.
+
+### Exercise: Wolf, Goat, and Cabbage
+
+The Wolf, Goat, and Cabbage problem is a classic river-crossing puzzle.  In
+this scenario, a farmer needs to cross a river with a wolf, a goat, and a
+cabbage.  The farmer has a small boat that can only carry himself and one of
+the three items at a time.  The challenge lies in ensuring that the wolf does
+not eat the goat when left alone together and the goat does not eat the cabbage
+under the same conditions.  Here are the rules:
+
+1. The farmer can take only one item at a time across the river.
+2. If left alone, the wolf will eat the goat, and the goat will eat the cabbage.
+3. The goal is to transport all three items across the river without any of them being eaten.
+
+Using a similar approach as the Water Jug Problem, represent the state of the
+game as a graph.  Define the states using a triplet notation $(F, W, G, C)$
+where these take values 0 and 1, meaning start or opposite side:
+
+- $F$ is the farmer's location (0 or 1)
+- $W$ is the wolf's location (0 or 1)
+- $G$ is the goat's location (0 or 1)
+- $C$ is the cabbage's location (0 or 1)
+
+Once you have your implementation, demonstrate that you can reach the goal
+state $(1, 1, 1, 1)$ starting from $(0, 0, 0, 0)$ and list the steps taken to
+do so.
+
+
+
+## Informed Search
+
+Dijkstra's algorithm works well for graphs with non-negative distances, but in
+some cases, it explores an excessively large part of the graph.  We will now
+look at an algorithm called $A^*$ that uses a _heuristic_ to "steer" the
+direction of the search.  It is simply Dijkstra's algorithm, but with a small
 estimation of remaining distance.
 
 ```python
 import heapq
 
-
 def astar(G, s, t, h):
   dist = {s: 0}
   parent = {s: None}
   heap = [(h(s), s)]
-
   while heap:
     _, u = heapq.heappop(heap)
     if u == t:
@@ -326,21 +429,40 @@ def astar(G, s, t, h):
 As mentioned above, suppose the energy usage for an EV is negative in certain
 steep downhill segments.
 
+Graphs with negative edge weights introduce new complexities into pathfinding
+algorithms.  While typical graph traversal problems---like roads or
+paths---naturally have non-negative weights (distance, cost, or time), negative
+weights can represent scenarios like energy regeneration in electric vehicles
+traveling downhill.  Here, the EV actually gains energy, making the edge weight
+negative.  This fundamentally alters the nature of shortest-path calculations.
+
+Algorithms like Dijkstra’s, which rely on non-negative edge weights, fail to
+handle negative distances correctly because they assume that visiting a node
+once guarantees the shortest path to it.  With negative edges, previously
+computed paths may need constant revising, potentially leading to incorrect
+results.  Thus, we require specialized algorithms such as the Bellman–Ford or
+Johnson's algorithms that can accommodate negative weights and correctly
+compute shortest paths even when negative cycles are present.
+
+Interestingly, negative cycles---loops with a negative total weight---can
+themselves become part of the gameplay mechanics.  For instance, players might
+exploit negative cycles strategically to replenish energy or accumulate
+resources, introducing intriguing tactical considerations into game design.
 
 
-## --- NOTES ---
-
-Covered in this section:
+## Future Reading
 
 * Problems
-  * planar $\sqrt n$ portals (distance oracle) and highways
+  * Randomly pick $\sqrt n$ nodes $P$ as _portals_ (keyword: transit nodes,
+    distance oracle, highways) and compute the APSP for $P$.
+  * Distance oracle for planar graphs
   * APSP
 * Algorithms
   * Bidirectional search
   * Floyd--Warshall
   * Bellman--Ford, Johnson's algorithm
 
-# Global navigation
+# Global Navigation
 
 * Problems
   * No-Lift Pencil Drawing
@@ -351,7 +473,7 @@ Covered in this section:
   * TSP
   * Longest path
 
-# Cutting and flowing
+# Cutting and Flowing
 
 * Problems
   * Matching (assignment)
@@ -419,10 +541,39 @@ Covered in this section:
   * Greedy algorithms for interval scheduling and coloring
 
 
-# What now?
+# What Now?
 
-## Dynamic graphs
+In this final chapter, we see some things that we didn't get to cover due to
+space or scope, but that nevertheless might be interesting to be aware of.
 
-Explain that **this changes everything**.
+## Dynamic Graphs
 
-Many graphs are temporal and dynamic, and algorithms here ... tough stuff
+Dynamic graphs extend the static model by allowing changes to the graph
+structure over time, including the addition or removal of vertices and edges.
+This characteristic is crucial for modeling real-world scenarios such as social
+networks, traffic systems, and game environments, where the relationships
+between entities evolve.
+
+Traditional algorithms designed for static graphs often struggle in these
+settings, as their assumptions about fixed structures can lead to
+inefficiencies or inaccuracies when applied to dynamic data.  As a result,
+dynamic graph algorithms must adapt to continually accommodate updates,
+enabling developers to maintain performance while responding to fluid gaming
+environments.
+
+
+## Online Algorithms
+
+Online algorithms are essential for scenarios where data arrives in a
+sequential manner, and decisions must be made without knowledge of future
+input.  This is particularly relevant in gaming, where an AI may need to
+respond to player actions in real-time without the luxury of hindsight.  These
+algorithms process information on the fly, making greedy choices based on the
+current state of the game.  While such strategies can yield efficient results,
+they often cannot guarantee optimal solutions; however, they can provide
+acceptable approximations quickly.
+
+Understanding the principles behind online algorithms allows game developers to
+create more responsive and engaging gaming experiences, as they can design
+systems that treat each player interaction as a new opportunity to adjust
+strategies dynamically.
