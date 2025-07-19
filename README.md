@@ -233,9 +233,27 @@ dist, parent = bfs(world, current_location)
 \noindent is the distance and a form of linked list leading from each vertex to
 a vertex closer to the start.
 
+
+
+
 ### Flood Filling
 
-This algorithm can also be used as a flood filling algorithm.
+Flood filling algorithms can simulate water flooding on discrete 2D surfaces
+embedded in 3D environments.  Imagine water pouring onto a terrain from a
+specific aquifer point: the water naturally spreads outward, filling
+neighboring lower or equal-height cells before progressively rising to higher
+elevations.  Using BFS, the simulation accurately captures this spreading
+behavior, incrementally marking cells as flooded while respecting the terrain's
+topography.
+
+By iteratively expanding the flooded region from the initial aquifer location,
+developers can realistically model scenarios like rising water levels, dynamic
+river flows, or inundation puzzles.  Such simulations not only enhance visual
+realism but also open up compelling gameplay mechanics where players must
+strategically manipulate terrain or barriers to direct water flow, protect
+certain regions, or solve environmental puzzles involving flooding.
+
+
 
 
 ### Weighted graphs
@@ -436,11 +454,11 @@ weights can represent scenarios like energy regeneration in electric vehicles
 traveling downhill.  Here, the EV actually gains energy, making the edge weight
 negative.  This fundamentally alters the nature of shortest-path calculations.
 
-Algorithms like Dijkstra’s, which rely on non-negative edge weights, fail to
+Algorithms like Dijkstra's, which rely on non-negative edge weights, fail to
 handle negative distances correctly because they assume that visiting a node
 once guarantees the shortest path to it.  With negative edges, previously
 computed paths may need constant revising, potentially leading to incorrect
-results.  Thus, we require specialized algorithms such as the Bellman–Ford or
+results.  Thus, we require specialized algorithms such as the Bellman--Ford or
 Johnson's algorithms that can accommodate negative weights and correctly
 compute shortest paths even when negative cycles are present.
 
