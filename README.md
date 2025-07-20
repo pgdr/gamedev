@@ -274,23 +274,20 @@ with _lowest possible value_).
 import heapq
 
 def dijkstra(G, s):
-  dist = {s: 0}
-  parent = {s: None}
-  visited = set()
-  heap = [(0, s)]
+  dist = D(lambda: INF)  # distance from source
+  visited = D(bool)      # visited = False
+  dist[source] = 0       # starting point
+  queue = [(0, source)]
 
-  while heap:
-    d, u = heapq.heappop(heap)
-    if u in visited:
+  while queue:
+    dv, v = heappop(queue)
+    if dist[v] <= dv:
       continue
-    visited.add(u)
-    for v, w in G[u]:
-      if v not in dist or d + w < dist[v]:
-        dist[v] = d + w
-        parent[v] = u
-        heapq.heappush(heap, (dist[v], v))
 
-  return dist, parent
+    for u in neighbors[v]:
+      if dist[u] > dv + w(v, u)
+        dist[u] = dv + w(v, u)
+        heappush(queue, (dist[u], u)
 ```
 
 
@@ -480,16 +477,75 @@ resources, introducing intriguing tactical considerations into game design.
   * Floyd--Warshall
   * Bellman--Ford, Johnson's algorithm
 
+
 # Global Navigation
 
-* Problems
-  * No-Lift Pencil Drawing
-  * TSP
-  * Ticket 2 Ride
-* Algorithms
-  * Euler walks
-  * TSP
-  * Longest path
+In the previous chapter, we saw problems where we wanted to find a path
+from one node in a graph to another, i.e., the fewest number of edges to
+connect one vertex to another.  All of the problems in the previous
+chapter are "easy", in the sense that they have an "efficient
+algorithm".  An _efficient algorithm_ is something we have defined to be
+an algorithm with a _polynomial running time_.  We will in this chapter
+see some problems that don't necessarily have such efficient
+algorithms.
+
+We mentioned that the shortest path is the problem of finding the fewest
+possible number of edges connecting $A$ to $B$.  What about the
+following: consider a road network where in each node, there is a house,
+except in one node, there is a power station.  You want to put up
+electric wires along (some of) the roads so that every house is
+connected to the power station, and you want to use as little wiring as
+possible.  In other words: find the fewest possible number of roads such
+that _all nodes_ are connected.  Surprisingly, perhaps, this problem has
+an efficient algorithm.
+
+## Trees In Our Graphs
+
+The aforementioned problem is called \textsc{Minimum Spanning Tree}.
+You are given a graph, preferably with weights, and you want to find a
+_spanning tree_ in the graph, that is a _tree_ that contains all edges.
+And out of all possible spanning trees, you want to find one which is as
+cheap as possible.  There are two famous algorithms for this problem,
+Prim's algorithm, which is Dijkstra's algorithm with simply this
+modification.
+
+```diff
+15,16c15,16
+<       if dist[u] > dv + w(v, u)
+<         dist[u] = dv + w(v, u)
+---
+>       if dist[u] > w(v, u)
+>         dist[u] = w(v, u)
+```
+
+Hence, we will focus on _Kruskal's algorithm_ for computing a _minimum
+spanning tree_, because it introduces a very nifty data structure:
+Union--Find.
+
+
+```python
+def find(u):
+  if comp[u] == u:
+    return u
+  else:
+    parent = find(u)
+    comp[u] = parent  # "memoize"
+    return parent
+
+def union(u, v):
+  r1 = find(u)
+  r2 = find(v)
+  comp[r1] = r2
+```
+
+## Future Reading
+
+* MST (connectivity and clustering)
+  * Union--find
+* Steiner tree
+* TSP/Hamiltonian Path or Cycle
+  * example: Ticket 2 Ride winning condition is Longest Path
+* No-Lift Pencil Drawing (Euler walk)
 
 # Cutting and Flowing
 
@@ -526,9 +582,6 @@ resources, introducing intriguing tactical considerations into game design.
   * Cluster editing
   * Community detection
   * Clique (?)
-  * MST (connectivity and clustering)
-    * Union--find
-  * Steiner tree
   * Centrality measures
   * Cascading and fire fighting, disease propagation
 * Algorithms
@@ -595,3 +648,24 @@ Understanding the principles behind online algorithms allows game developers to
 create more responsive and engaging gaming experiences, as they can design
 systems that treat each player interaction as a new opportunity to adjust
 strategies dynamically.
+
+
+# Notes
+
+\pagebreak
+
+\phantom{page intentionally left blank}
+
+\pagebreak
+
+\phantom{page intentionally left blank}
+
+
+\pagebreak
+
+\phantom{page intentionally left blank}
+
+
+\pagebreak
+
+\phantom{page intentionally left blank}
