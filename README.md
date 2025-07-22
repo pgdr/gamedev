@@ -501,7 +501,7 @@ an efficient algorithm.
 
 ## Trees In Our Graphs
 
-The aforementioned problem is called \textsc{Minimum Spanning Tree}.
+The aforementioned problem is called \textsc{Minimum Spanning Tree} (MST).
 You are given a graph, preferably with weights, and you want to find a
 _spanning tree_ in the graph, that is a _tree_ that contains all edges.
 And out of all possible spanning trees, you want to find one which is as
@@ -538,10 +538,20 @@ def union(u, v):
   comp[r1] = r2
 ```
 
+## Steiner Tree: Non-Full Spanning Trees
+
+We now come to the first problem in this pamphlet that we cannot see a
+polynomial time algorithm for, even though ... in a sense ... it sounds simpler
+than the previous problem.
+
+Suppose you have the same road network as above, with a power station and
+houses, but now not every node is a house, there are just houses in some of the
+nodes.  Meaning that you have _fewer_ houses than before.  The problem,
+however, is the same: Find the minimum network (in terms of electric cabling)
+possible that connects all houses to the power station.
+
 ## Future Reading
 
-* MST (connectivity and clustering)
-  * Union--find
 * Steiner tree
 * TSP/Hamiltonian Path or Cycle
   * example: Ticket 2 Ride winning condition is Longest Path
