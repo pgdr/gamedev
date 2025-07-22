@@ -1,11 +1,11 @@
 ---
 documentclass: memoir
-fontsize: 13pt
+fontsize: 14pt
 title: Introduction to Graph Theory for Gamedevs
 author: Pål Grønås Drange
 date: Summer 2025
 papersize:
-  - a4paper
+  - a4
 header-includes:
   - \usepackage{microtype}
   - \usepackage{newpx}
@@ -550,12 +550,65 @@ nodes.  Meaning that you have _fewer_ houses than before.  The problem,
 however, is the same: Find the minimum network (in terms of electric cabling)
 possible that connects all houses to the power station.
 
-## Future Reading
 
-* Steiner tree
-* TSP/Hamiltonian Path or Cycle
-  * example: Ticket 2 Ride winning condition is Longest Path
-* No-Lift Pencil Drawing (Euler walk)
+## Travelling Sale
+
+If you are standing on a location $A$ and want to reach a location $B$, we know
+what to do; shortest path.  However, what if you want to visit not one but two
+locations?  Well, either $ABC$ or $ACB$.  What if three locations?  Well,
+either one of $ABCD, ABDC, ACBD, ACDB, ADBC, ADCB$.  This set doesn't only grow
+_exponentially_, it grows _super-exponentially_: Like $n^n$, which is something
+like $n^{\log_2 n}$.
+
+There is, however, an algorithm that solves the problem in time $2^nn^2$.
+
+
+### Hamiltonian Path
+
+### Travelling Salesman
+
+### Longest Path
+
+In \textsc{Ticket 2 Ride}, the winning criterion is who has built the longest path.
+This is in fact an NP-hard problem!  The game developers ask us to, after the game has been completed, to solve a problem known to need exponential time!  The audacity ...
+
+
+## Euler Tour, or: Bridges of Königsberg
+
+A problem very similar to the Hamiltonian Cycle problem is: What if you don't
+visit every _node_ exactly once, but ever _edge_ exactly once.  Surprisingly,
+this is solvable with a trivial check.
+
+Suppose you have a set of domino, and you want to arrange them such that they
+form a path in which every adjacent domino tile has meeting same face value.
+
+Another problem is the classical: Draw this drawing with a pencil without
+lifting the pencil from the paper.
+
+Yet a third game possibility: In each hallway there is a door and once you pass
+through a door you get a bucket of gold and the door closes shut forever (with
+you on the other side).  Can you collect all the gold?
+
+
+### The algorithms:
+
+Two cases: Either you start and end in the same node.  Then you enter and exit
+each vertex the same number of times, hence check all degrees are even.
+
+Or you start and end in different nodes: Exactly two nodes have odd degree.
+
+That's it.
+
+```python
+
+def euler(G, v):
+  for u in G[v]:   # should be a while loop
+    G.remove(u, v)
+    euler(G, u)
+    yield v
+
+```
+
 
 # Cutting and Flowing
 
