@@ -9,6 +9,7 @@ papersize:
 header-includes:
   - \usepackage{microtype}
   - \usepackage{newpx}
+  - \usepackage{tcolorbox}
   - \usepackage{froufrou}
 abstract: |
 
@@ -233,6 +234,10 @@ dist, parent = bfs(world, current_location)
 \noindent is the distance and a form of linked list leading from each vertex to
 a vertex closer to the start.
 
+In fact, since BFS (and as we will later see, Dijkstra's algorithm) finds the
+shortest path from a specific _source_ to all other vertices (unless
+specifically aborted once we reach our target, of course), we sometimes refer
+to this problem as \textsc{Single Source Shortest Path}, or SSSP for short.
 
 
 
@@ -263,7 +268,8 @@ everywhere; for example running in water or running uphill can be more
 expensive, we need an algorithm that can deal with these costs.  BFS can
 unfortunately not.
 
-Dijkstra's algorithm is an algorithm that works similarly to BFS, but instead
+Dijkstra's algorithm is an SSSP (single source shortest path) algorithm that
+works similarly to BFS, but instead
 of a queue that we iterate through, we have a _priority queue_.  A priority
 queue is a queue in which the First In First Out is replaced with "Most
 Important Out".  That is, the order of insertion is irrelevant; when we pop
@@ -415,7 +421,8 @@ Dijkstra's algorithm works well for graphs with non-negative distances, but in
 some cases, it explores an excessively large part of the graph.  We will now
 look at an algorithm called $A^*$ that uses a _heuristic_ to "steer" the
 direction of the search.  It is simply Dijkstra's algorithm, but with a small
-estimation of remaining distance.
+estimation of remaining distance.  However, contrary to Dijkstra's algorithm,
+we necessarily terminate when we discover $t$, so this is _not_ an SSSP.
 
 ```python
 import heapq
@@ -602,7 +609,8 @@ That's it.
 ```python
 
 def euler(G, v):
-  for u in G[v]:   # should be a while loop
+  while G[v]:
+    u = G[v][0]
     G.remove(u, v)
     euler(G, u)
     yield v
@@ -611,6 +619,29 @@ def euler(G, v):
 
 
 # Cutting and Flowing
+
+In this chapter, we will discuss a fundamental graph theory concept.
+
+Let $G = (V, E, c)$ be a _weighted and directed_ graph, where $c: E \to
+\mathbb{N}$ denotes the _capacity_ of each edge, whatever capacity means.  In
+this section, we will refer to $(G, s, t)$ as a _flow network_, and to confuse
+us a bit, we will compute the _network flow_ of the given _flow network_.
+
+Intuitively, the _flow_ of a network is easy to understand.  Suppose that you
+put a garden hose with _infinite_ water pressure and stick it into $s$, and you
+see poke a hole in $t$, to see how much water comes out of $t$ (per time unit).
+
+If the capacity of an edge $e = (u,v)$ is $c(e) = 3$, that means that $3$ units
+of flow per time unit can go through $e$.  For simplicity: $3$ liters of waters
+per second, i.e., $c(e) \ell/s$.  How many $\ell/s$ comes out of $t$?  This is
+the \textsc{Maximum Flow} problem.
+
+\begin{tcolorbox}[title=Theory]
+
+Menger's theorem says that the number of disjoint paths from $s$ to $t$ is
+equal to the number of edges we have to remove to cut $s$ from $t$.
+
+\end{tcolorbox}
 
 * Problems
   * Matching (assignment)
