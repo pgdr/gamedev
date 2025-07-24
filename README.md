@@ -649,6 +649,50 @@ equal to the number of edges we have to remove to cut $s$ from $t$.
 
 \end{tcolorbox}
 
+## Minimum Cut
+
+Suppose you have a tower defense like game, where the enemy sends units from
+some source towards your castle in an intricate road network.  You can put up
+turrets that kill all enemies passing a certain point in the road network.
+Where should you put turrets so that no enemy unit can reach your castle?
+Here we can also add different costs to the turrets positions (e.g. it's
+expensive on grass and cheap on gravel).
+This problem is called the \textsc{Minimum $s$-$t$-Cut} problem.
+
+Let $G = (V, E)$ be a graph and $s$ and $t$ two vertices.  Which edges should
+you remove from the graph such that you disconnect $s$ from $t$?
+
+Menger's theorem, and the so-called Max Flow--Min Cut theorem states that the
+maximum $s$-$t$-flow value is exactly the same as the minimum $s$-$t$-cut
+value, and we can find the cut by running and algorithm for maximum flow.
+
+The algorithm is quite simple, but at the same time not very intuitive.  We are
+not diving into the reason why it works here, but just state that a simple
+greedy approach does not work, but that what is needed is to construct a
+_residual graph_ that we actually can run a greedy-ish algorithm on.  The
+entire algorithm can be summarized in these few lines:
+
+```python
+def maxflow(graph, s, t):
+  flow = 0
+  while P := bfs(graph, s, t):
+    bottleneck = min(graph.F[v][u] for (v, u) in edges(P))
+    print(P, bottleneck)
+    if bottleneck == 0:
+      return flow
+    flow += bottleneck
+    for i in range(1, len(P)):
+      v, u = P[i - 1], P[i]
+      graph.F[v][u] -= bottleneck
+      graph.F[u][v] += bottleneck
+  return flow
+```
+
+If we run the above algorithm on our Tower Defense graph, and then run a BFS
+from $s$ in the remaining graph, we will get the left hand side of the minimum
+cut; Simply place turrets on all edges that leave this set; this will be
+optimal, even in the weighted setting.
+
 * Problems
   * Matching (assignment)
   * Min s-t-Cut
