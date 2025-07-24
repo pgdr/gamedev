@@ -584,13 +584,19 @@ This is in fact an NP-hard problem!  The game developers ask us to, after the ga
 
 A problem very similar to the Hamiltonian Cycle problem is: What if you don't
 visit every _node_ exactly once, but ever _edge_ exactly once.  Surprisingly,
-this is solvable with a trivial check.
+this is solvable with a trivial check.  Graph theory was invented in 1736 when
+mathematician Leonhard Euler presented the solution to the famous problem of
+the seven bridges of Königsberg.
 
-Suppose you have a set of domino, and you want to arrange them such that they
-form a path in which every adjacent domino tile has meeting same face value.
+Arranging domino tiles can be modeled by an Eulerian path, where each tile
+represents an edge and each face value corresponds to a vertex in the graph.
+To successfully create a continuous path using the tiles, one must ensure that
+the graph formed by the dominoes adheres to specific conditions: either all
+vertices have an even degree, allowing for a closed loop, or exactly two
+vertices have an odd degree, permitting a path.
 
-Another problem is the classical: Draw this drawing with a pencil without
-lifting the pencil from the paper.
+This concept extends beyond dominoes into various game mechanics, such as
+drawing a figure without lifting your pencil from the paper.
 
 Yet a third game possibility: In each hallway there is a door and once you pass
 through a door you get a bucket of gold and the door closes shut forever (with
