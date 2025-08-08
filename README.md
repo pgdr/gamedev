@@ -471,6 +471,119 @@ themselves become part of the gameplay mechanics.  For instance, players might
 exploit negative cycles strategically to replenish energy or accumulate
 resources, introducing intriguing tactical considerations into game design.
 
+```python
+def floyd_warshall(G):
+  dist = [[INFTY for _ in range(n)] for _ in range(n)]
+  for u in nodes:
+    dist[u][u] = 0
+    for v, w in G[u]:
+      dist[u][v] = w
+      next_node[u][v] = v
+
+  for k in nodes:
+    for i in nodes:
+      for j in nodes:
+        if dist[i][k] + dist[k][j] < dist[i][j]:
+          dist[i][j] = dist[i][k] + dist[k][j]
+          next_node[i][j] = next_node[i][k]
+
+  for u in nodes:
+    if dist[u][u] < 0:
+      raise ValueError("Graph contains a negative-weight cycle")
+
+  return dist, next_node
+```
+
+
+Alternatively, 
+
+```python
+def bellman_ford(G, s):
+  dist = {v: float("inf") for v in G}
+  dist[s] = 0
+  parent = {v: None for v in G}
+  n = len(G)
+
+  # Relax edges up to n-1 times
+  for _ in range(n - 1):
+    updated = False
+    for u in G:
+      for v, w in G[u]:
+        if dist[u] + w < dist[v]:
+          dist[v] = dist[u] + w
+          parent[v] = u
+          updated = True
+    if not updated:
+      break
+
+  # Check for negative-weight cycles
+  for u in G:
+    for v, w in G[u]:
+      if dist[u] + w < dist[v]:
+        raise ValueError("Graph contains a negative-weight cycle")
+
+  return dist, parent
+```
+
+## Bidirectional search
+
+We saw that BFS can be used to solve puzzles such as the *Wolf, Goat, and
+Cabbage* problem and the *Water Jug* problem.  However, the nodes explored
+grows exponentially in the depth; If the *branching factor* is $b$ and the
+_distance_ from the start to the goal is $d$, the total number of nodes
+explored is $d^b$.
+
+There is a way to drastically reduce the number of explored nodes, however.
+Imagine that the search is a circle, and the number of nodes explored is the
+_area_ of the circle.  Then the area is $\pi d^2$, where $d$ is distance from
+start to goal.  If we *instead* search from the start node and the goal node
+*simultaneously*, and abort the search once the two searches intersect, you can
+visualize this as _two circles_ with radius $d/2$.  The area of two circles
+with half the radius is much smaller than the area of one large circle with the
+full radius (by quadratic order).
+
+The same reasoning holds in our case, but where the quadratic improvement
+becomes a (potentially) exponential improvement.  If the (and this is a **big
+if**) _branching factor_ is the same in both directions, then we expore $2
+(d/2)^b$ nodes instead, which is $2 \frac{d^b}{2^b}$, i.e., it shaves off an
+exponential fraction.
+
+\paragraph{Reverse branching factor.}  So what is the _reverse branching
+factor_ for different cases?  In the *Rubik's cube* problem, it is the same if
+we go back or forth.  In each state we have 12 possible move, and it doesn't
+matter if we go forwards or backwards; if we want to move from the goal state
+to the start state, we have the same possible moves.  The same holds for the
+*15-puzzle* problem.  In each case, we can move the blank N/S/E/W, i.e., the
+branching factor is 4 both forwards and backwards.  Also in (undirected) graph
+searching, the backwards is the same as the forwards; It is the _degree_ of the
+vertex $\deg(v)$.
+
+However, for the Water-Jug problem the approach breaks down.  Suppose that you
+are in a state, e.g. $(0,0)$.  In the forwards direction we have 6 potential
+moves always.  However, in the reverse direction, we must ask: *where did we
+come from* to reach $(0,0)$.  And it turns out that there are many more
+possibilities: the previous *move* could have been to empty the first jug.
+However, then the previous state could have been any of $(k, 0)$ for $1 \leq k
+\leq 5$.  The same for the second jug, $(0,k)$.  The problem becomes much worse
+if we say that the capacities for the jugs are, say, 17 and 43.  In the
+forwards direction we still only have 6 possibilities:
+
+$$ a\to 0\quad b\to 0\quad a\to b\quad b\to a\quad \infty \to a\quad \infty \to b. $$
+
+\paragraph{Exercise:} How many moves does it take to get to state `Jugs(b17=0,
+b43=4)` if your bottles are of capacities 17 and 43.  How many nodes are
+explored in BFS versus bidirectional search?
+
+\paragraph{Exercise:} Implement bidirectional search for the 15 puzzle.
+Compare the number of explored nodes with $A^*$.
+
+\paragraph{Exercise:} Suppose you are at $x$ and $y$.  Your potential moves are
+always $(x+y, x)$ and $(y, x+y)$.  Write an algorithm for finding out if there
+is a path from $(1,1)$ to $(a,b)$.
+
+
+
+
 
 ## Future Reading
 
@@ -481,8 +594,7 @@ resources, introducing intriguing tactical considerations into game design.
   * APSP
 * Algorithms
   * Bidirectional search
-  * Floyd--Warshall
-  * Bellman--Ford, Johnson's algorithm
+  * Johnson's algorithm
 
 
 # Global Navigation
