@@ -678,7 +678,7 @@ however, is the same: Find the minimum network (in terms of electric cabling)
 possible that connects all houses to the power station.
 
 
-## Travelling Sale
+## Travelling Salesman
 
 If you are standing on a location $A$ and want to reach a location $B$, we know
 what to do; shortest path.  However, what if you want to visit not one but two
@@ -687,12 +687,40 @@ either one of $ABCD, ABDC, ACBD, ACDB, ADBC, ADCB$.  This set doesn't only grow
 _exponentially_, it grows _super-exponentially_: Like $n^n$, which is something
 like $n^{\log_2 n}$.
 
-There is, however, an algorithm that solves the problem in time $2^nn^2$.
-
+There is, however, an algorithm that solves the problem in time $2^nn^2$.  But
+before we look at Travelling Salesman, we'll look at a fundamental graph
+property, _hamiltonicity_.
 
 ### Hamiltonian Path
 
+Is it possible to walk through your graph, visiting every vertex exactly once,
+ending up in the same vertex you started in?  If so, the graph is
+_Hamiltonian_.  A Hamiltonian cycle is a simple cycle on $n$ vertices.  A
+Hamiltonian path is a simple path on $n$ vertices.
+
+The naïve algorithm for checking if a graph has a Hamiltonian path:
+
+```python
+def hamiltonian_path(G):
+  DP = defaultdict(lambda: INFTY)
+  for v in G.nodes:
+    DP[{v}, v] = 0
+  for S in subsets(G.nodes):
+    DP[S, v] = min(DP(S.minus(u), u) + G[u, v].weight for u in S)
+  return any(DP[set(G.nodes, v)] for v in G.nodes)
+```
+
+
+
 ### Travelling Salesman
+
+Travelling Salesman is basically the same problem as Hamiltonian path or cycle,
+except that you don't necessarily have to visit every node.  Suppose you have a
+bunch of _points of interests_ that are spread around in a large graph.  You
+need to visit every POI in as short a distance as possible.
+
+The easy solution is to run APSP and then take graph with only the POIs.
+
 
 ### Longest Path
 
