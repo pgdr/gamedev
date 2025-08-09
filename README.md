@@ -471,31 +471,8 @@ themselves become part of the gameplay mechanics.  For instance, players might
 exploit negative cycles strategically to replenish energy or accumulate
 resources, introducing intriguing tactical considerations into game design.
 
-```python
-def floyd_warshall(G):
-  dist = [[INFTY for _ in range(n)] for _ in range(n)]
-  for u in nodes:
-    dist[u][u] = 0
-    for v, w in G[u]:
-      dist[u][v] = w
-      next_node[u][v] = v
-
-  for k in nodes:
-    for i in nodes:
-      for j in nodes:
-        if dist[i][k] + dist[k][j] < dist[i][j]:
-          dist[i][j] = dist[i][k] + dist[k][j]
-          next_node[i][j] = next_node[i][k]
-
-  for u in nodes:
-    if dist[u][u] < 0:
-      raise ValueError("Graph contains a negative-weight cycle")
-
-  return dist, next_node
-```
 
 
-Alternatively, 
 
 ```python
 def bellman_ford(G, s):
@@ -583,6 +560,39 @@ is a path from $(1,1)$ to $(a,b)$.
 
 
 
+## All-Pairs Shortest Paths
+
+In certain cases, it's useful to compute all shortest paths between all pairs.
+However, it is important to realize that if we have $n$ vertices, then there
+are $n^2$ pairs (if the graph is undirected, we can get away with $1/2n^2$
+pairs).  In any case, any algorithm that computes all these $n^2$ values has to
+use at least $n^2$ time.  If we run Dijkstra's algorithm for each vertex, we
+end up with a running time of $O(n \cdot ( m \log n))$.
+
+The APSP problem is a foundational problem in theoretical computer science and
+faster algorithms are being developed every decade.  For the unweighted
+undirected version, the problem can be solved as quickly as matrix
+multiplication, and for the weighted case, it can be approximated in the same
+time.
+
+In $n^3$ time, we can compute, using dynamic programming, the APSP dists
+dictionary.
+
+```python
+def apsp(G):
+  dists = {(u, v): INFTY for u, v in choice(G.nodes, 2)}
+  for node in G.nodes:
+    dists[(node, node)] = 0
+  for u, v, data in G.edges(data=True):
+    dists[(u, v)] = data.get("weight", 1)
+    dists[(v, u)] = data.get("weight", 1)
+  for k in G.nodes:
+    for i in G.nodes:
+      for j in G.nodes:
+        if dists[(i, j)] > dists[(i, k)] + dists[(k, j)]:
+          dists[(i, j)] = dists[(i, k)] + dists[(k, j)]
+  return dists
+```
 
 
 ## Future Reading
@@ -591,9 +601,7 @@ is a path from $(1,1)$ to $(a,b)$.
   * Randomly pick $\sqrt n$ nodes $P$ as _portals_ (keyword: transit nodes,
     distance oracle, highways) and compute the APSP for $P$.
   * Distance oracle for planar graphs
-  * APSP
 * Algorithms
-  * Bidirectional search
   * Johnson's algorithm
 
 
