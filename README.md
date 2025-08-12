@@ -319,6 +319,10 @@ until either pourer becomes empty or the pouree becomes full: $(\max(c_5 - c_3,
 0), \min(c_5 + c_3, 5))$, or the other way around.  How do we go from $(0,0)$ to
 $(0, 4)$?  Simply run `bfs(G, (0,0))`.
 
+Let us denote the possible moves as follows
+$$ a\to 0\quad b\to 0\quad a\to b\quad b\to a\quad \infty \to a\quad \infty \to b, $$
+where $a \to 0$ means we empty the first bucket, $a\to b$ means me transfer content from $a$ to $b$ until either $a$ is empty or $b$ is full (whichever happens first), and $\infty \to a$ means we fill up $a$ (similarly with $a$ and $b$ swapped).
+
 \clearpage
 
 ```python
@@ -344,14 +348,14 @@ START = Jugs(0, 0)
 GOAL = Jugs(0, 4)
 
 def next_state(state):
-  yield Jugs(0, state.b5)
-  yield Jugs(state.b3, 0)
-  yield Jugs(3, state.b5)
-  yield Jugs(state.b3, 5)
+  yield Jugs(0, state.b5)  # b3 → 0
+  yield Jugs(state.b3, 0)  # b5 → 0
+  yield Jugs(3, state.b5)  # ∞ → b3
+  yield Jugs(state.b3, 5)  # ∞ → b5
   yield Jugs(max(state.b3 - (5 - state.b5), 0),
-             min(5, state.b3 + state.b5))
+             min(5, state.b3 + state.b5))       # b3 → b5
   yield Jugs(min(3, state.b3 + state.b5),
-             max(state.b5 - (3 - state.b3), 0))
+             max(state.b5 - (3 - state.b3), 0)) # b5 → b3
 
 def is_goal(state):
   return state == GOAL
@@ -368,7 +372,7 @@ for step, state in enumerate(reversed(solution)):
 
 \clearpage
 
-The above code solves the Water Jug Problem and will print the steps needed to
+The above code solves the _Water Jug Problem_ and will print the steps needed to
 take to achieve the solution.
 
 ```
@@ -506,13 +510,13 @@ def bellman_ford(G, s):
 ## Bidirectional search
 
 We saw that BFS can be used to solve puzzles such as the *Wolf, Goat, and
-Cabbage* problem and the *Water Jug* problem.  However, the nodes explored
+Cabbage* problem and the *Water Jug* problem.  However, the number of nodes explored
 grows exponentially in the depth; If the *branching factor* is $b$ and the
 _distance_ from the start to the goal is $d$, the total number of nodes
-explored is $d^b$.
+explored is $b^d$.
 
 There is a way to drastically reduce the number of explored nodes, however.
-Imagine that the search is a circle, and the number of nodes explored is the
+As an illustration, imagine that the search is a circle, and the number of nodes explored is the
 _area_ of the circle.  Then the area is $\pi d^2$, where $d$ is distance from
 start to goal.  If we *instead* search from the start node and the goal node
 *simultaneously*, and abort the search once the two searches intersect, you can
@@ -523,27 +527,29 @@ full radius (by quadratic order).
 The same reasoning holds in our case, but where the quadratic improvement
 becomes a (potentially) exponential improvement.  If the (and this is a **big
 if**) _branching factor_ is the same in both directions, then we expore $2
-(d/2)^b$ nodes instead, which is $2 \frac{d^b}{2^b}$, i.e., it shaves off an
-exponential fraction.
+b^{d/2}$ nodes instead, which is $2 \frac{d^b}{2^b}$, i.e., it reduces the
+number of explored nodes by an exponential factor.
 
-\paragraph{Reverse branching factor.}  So what is the _reverse branching
+\paragraph{Backwards branching factor.}  So what is the _backwards branching
 factor_ for different cases?  In the *Rubik's cube* problem, it is the same if
-we go back or forth.  In each state we have 12 possible move, and it doesn't
+we go back or forth.  In each state we have 12 possible moves, and it doesn't
 matter if we go forwards or backwards; if we want to move from the goal state
 to the start state, we have the same possible moves.  The same holds for the
 *15-puzzle* problem.  In each case, we can move the blank N/S/E/W, i.e., the
-branching factor is 4 both forwards and backwards.  Also in (undirected) graph
-searching, the backwards is the same as the forwards; It is the _degree_ of the
+branching factor is 4 both forwards and backwards.  In undirected graph search,
+the backward branching factor is the same as the forward one;
+It is the _degree_ of the
 vertex $\deg(v)$.
 
 However, for the Water-Jug problem the approach breaks down.  Suppose that you
 are in a state, e.g. $(0,0)$.  In the forwards direction we have 6 potential
-moves always.  However, in the reverse direction, we must ask: *where did we
+moves always.  However, in the backwards direction, we must ask: *where did we
 come from* to reach $(0,0)$.  And it turns out that there are many more
 possibilities: the previous *move* could have been to empty the first jug.
-However, then the previous state could have been any of $(k, 0)$ for $1 \leq k
-\leq 5$.  The same for the second jug, $(0,k)$.  The problem becomes much worse
-if we say that the capacities for the jugs are, say, 17 and 43.  In the
+In that case, the previous state could have been any of $(k, 0)$ for $1 \leq k
+\leq 5$.  The same for the second jug, $(0,k)$.
+The problem becomes much worse if the jugs’ capacities are,
+say, 17 and 43.  In the
 forwards direction we still only have 6 possibilities:
 
 $$ a\to 0\quad b\to 0\quad a\to b\quad b\to a\quad \infty \to a\quad \infty \to b. $$
