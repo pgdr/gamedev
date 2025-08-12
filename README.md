@@ -517,7 +517,7 @@ explored is $b^d$.
 
 There is a way to drastically reduce the number of explored nodes, however.
 As an illustration, imagine that the search is a circle, and the number of nodes explored is the
-_area_ of the circle.  Then the area is $\pi d^2$, where $d$ is distance from
+_area_ of the circle.  Then the area is $\pi d^2$, where $d$ (radius) is distance from
 start to goal.  If we *instead* search from the start node and the goal node
 *simultaneously*, and abort the search once the two searches intersect, you can
 visualize this as _two circles_ with radius $d/2$.  The area of two circles
@@ -527,8 +527,17 @@ full radius (by quadratic order).
 The same reasoning holds in our case, but where the quadratic improvement
 becomes a (potentially) exponential improvement.  If the (and this is a **big
 if**) _branching factor_ is the same in both directions, then we expore $2
-b^{d/2}$ nodes instead, which is $2 \frac{d^b}{2^b}$, i.e., it reduces the
-number of explored nodes by an exponential factor.
+b^{d/2}$ nodes instead, i.e. $\sqrt{b^d}$, it significantly reduces the
+number of explored nodes.
+
+
+
+\begin{tcolorbox}[title=Example]
+For example, let $b=12$ and $d=24$ (a natural assumption for Rubik's cube).
+If we explore a billion nodes per second,
+then running BFS would take about 600 million years.
+By using bidirectional search, it would take less than an hour.
+\end{tcolorbox}
 
 \paragraph{Backwards branching factor.}  So what is the _backwards branching
 factor_ for different cases?  In the *Rubik's cube* problem, it is the same if
