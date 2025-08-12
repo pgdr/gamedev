@@ -881,7 +881,35 @@ optimal, even in the weighted setting.
   * Louvain and LCA
   * Betweenness, Page rank
 
+
+
+
 # Geometric Embeddings
+
+If you look at a standard game board of, say, Risk, you'll see that the world
+is partitioned into regions using borders consisting of small line segments.
+Suppose that you create a bunch of walls, borders, or fences, and want to find
+out what the regions are.
+
+This problem is on the outer perimeter of graph theory, but it is in some sense
+related to geometric embeddings of planar graphs, so we cover it here.
+
+Suppose that you draw a bunch of points in the plane, and you between some of
+the pyoints you draw straight lines.  The points (fenceposts) in the plane are
+your nodes and the straight lines (the fence itself) are your edges.
+
+If you draw this graph in such a way that no edges intersect (except in their
+endpoints), you have what's called a _straight line drawing of a planar graph_.
+
+If your graph is 2-connected (i.e., has no bridge), then every edge separates
+two regions, called _faces_.  How can we programmatically detect the faces
+(regions) of such a graph, and how would such a mapping look in code,
+specifically, how can we color every region with a distinct color?
+
+
+
+
+
 
 * Problems
   * Regions from fences (Planar dual)
