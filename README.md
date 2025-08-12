@@ -11,6 +11,7 @@ header-includes:
   - \usepackage{newpx}
   - \usepackage{tcolorbox}
   - \usepackage{froufrou}
+  - \DeclareUnicodeCharacter{221E}{\ensuremath{\infty}}
 abstract: |
 
     This pamphlet serves two purposes.
