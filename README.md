@@ -29,7 +29,7 @@ abstract: |
 
 \tableofcontents
 
-# Basic graph theory and representation
+# Dots and Lines
 
 A graph is a mathematical object where we have objects (abstractly called nodes
 or vertices) and relations between them.  If two objects, e.g. $v_1$ and $v_2$
