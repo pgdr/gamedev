@@ -1,33 +1,49 @@
 ---
-documentclass: memoir
-fontsize: 14pt
+documentclass: book
+fontsize: 13pt
 title: Introduction to Graph Theory for Gamedevs
 author: Pål Grønås Drange
 date: Summer 2025
 papersize:
-  - a4
+  - a5
 header-includes:
   - \usepackage{microtype}
   - \usepackage{newpx}
+  - \usepackage[USenglish]{babel}
   - \usepackage{tcolorbox}
   - \usepackage{froufrou}
   - \DeclareUnicodeCharacter{221E}{\ensuremath{\infty}}
-abstract: |
-
-    This pamphlet serves two purposes.
-
-    1. Introduce graph theory to teach concepts and graph structures for game
-       developers, both programmers and artistic creators. This also entails
-       the explanation of some algorithms, although all algorithms mentioned
-       herein are relatively simple.
-
-    2. Through structures, models, and problems from graph theory, inspire game
-       creators about possible games, puzzles, and AI strategies. It may also
-       explain what makes certain graph problems easy or hard.
-
 ---
+\frontmatter
+# Preface
+
+This pamphlet serves two purposes.
+
+1. Introduce graph theory to teach concepts and graph structures for game
+   developers, both programmers and artistic creators. This also entails
+   the explanation of some algorithms, although all algorithms mentioned
+   herein are relatively simple.
+
+2. Through structures, models, and problems from graph theory, inspire game
+   creators about possible games, puzzles, and AI strategies. It may also
+   explain what makes certain graph problems easy or hard.
+
+Every chapter in this brochure starts with an informal discussion about
+a concept from graph theory.  This informal exposition should be
+understandable by just about anybody interested enough to pick up this
+brochure from wherever it was found.
+
+The informal discussion is meant to foster ideas about game mechanisms
+and how to take concepts from graph theory into the game world.
+Following the informal discussion will be a more formal part containing
+some formalisms, and occasionally straight-up theorems.
+Finally, each chapter ends with a verse on algorithms for the specific
+concepts described.
+
 
 \tableofcontents
+
+\mainmatter
 
 # Dots and Lines
 
@@ -277,6 +293,8 @@ Important Out".  That is, the order of insertion is irrelevant; when we pop
 from the queue, we pop the one with highest priority (typically this is the one
 with _lowest possible value_).
 
+\clearpage
+\scriptsize
 ```python
 import heapq
 
@@ -296,7 +314,8 @@ def dijkstra(G, s):
         dist[u] = dv + w(v, u)
         heappush(queue, (dist[u], u)
 ```
-
+\normalsize
+\clearpage
 
 ## Puzzle Solving
 
@@ -324,6 +343,8 @@ $$ a\to 0\quad b\to 0\quad a\to b\quad b\to a\quad \infty \to a\quad \infty \to 
 where $a \to 0$ means we empty the first bucket, $a\to b$ means me transfer content from $a$ to $b$ until either $a$ is empty or $b$ is full (whichever happens first), and $\infty \to a$ means we fill up $a$ (similarly with $a$ and $b$ swapped).
 
 \clearpage
+
+\scriptsize
 
 ```python
 from collections import deque, namedtuple
@@ -369,6 +390,7 @@ solution.append(START)
 for step, state in enumerate(reversed(solution)):
   print((1 + step), state)
 ```
+\normalsize
 
 \clearpage
 
@@ -429,6 +451,8 @@ direction of the search.  It is simply Dijkstra's algorithm, but with a small
 estimation of remaining distance.  However, contrary to Dijkstra's algorithm,
 we necessarily terminate when we discover $t$, so this is _not_ an SSSP.
 
+\clearpage
+\scriptsize
 ```python
 import heapq
 
@@ -449,7 +473,8 @@ def astar(G, s, t, h):
 
   return dist, parent
 ```
-
+\normalsize
+\clearpage
 
 ## Negative Distances
 
@@ -478,7 +503,8 @@ resources, introducing intriguing tactical considerations into game design.
 
 
 
-
+\clearpage
+\scriptsize
 ```python
 def bellman_ford(G, s):
   dist = {v: float("inf") for v in G}
@@ -506,6 +532,8 @@ def bellman_ford(G, s):
 
   return dist, parent
 ```
+\normalsize
+\clearpage
 
 ## Bidirectional search
 
@@ -594,6 +622,8 @@ time.
 In $n^3$ time, we can compute, using dynamic programming, the APSP dists
 dictionary.
 
+\clearpage
+\scriptsize
 ```python
 def apsp(G):
   dists = {(u, v): INFTY for u, v in choice(G.nodes, 2)}
@@ -609,6 +639,8 @@ def apsp(G):
           dists[(i, j)] = dists[(i, k)] + dists[(k, j)]
   return dists
 ```
+\normalsize
+\clearpage
 
 
 ## Future Reading
@@ -716,6 +748,8 @@ Hamiltonian path is a simple path on $n$ vertices.
 
 The naïve algorithm for checking if a graph has a Hamiltonian path:
 
+\clearpage
+\scriptsize
 ```python
 def hamiltonian_path(G):
   DP = defaultdict(lambda: INFTY)
@@ -725,7 +759,8 @@ def hamiltonian_path(G):
     DP[S, v] = min(DP(S.minus(u), u) + G[u, v].weight for u in S)
   return any(DP[set(G.nodes, v)] for v in G.nodes)
 ```
-
+\normalsize
+\clearpage
 
 
 ### Travelling Salesman
@@ -836,6 +871,8 @@ greedy approach does not work, but that what is needed is to construct a
 _residual graph_ that we actually can run a greedy-ish algorithm on.  The
 entire algorithm can be summarized in these few lines:
 
+\clearpage
+\scriptsize
 ```python
 def maxflow(graph, s, t):
   flow = 0
@@ -851,6 +888,8 @@ def maxflow(graph, s, t):
       graph.F[u][v] += bottleneck
   return flow
 ```
+\normalsize
+\clearpage
 
 If we run the above algorithm on our Tower Defense graph, and then run a BFS
 from $s$ in the remaining graph, we will get the left hand side of the minimum
@@ -986,7 +1025,13 @@ systems that treat each player interaction as a new opportunity to adjust
 strategies dynamically.
 
 
+\clearpage
+
 # Notes
+
+\vfill
+
+\phantom{X}
 
 \pagebreak
 
