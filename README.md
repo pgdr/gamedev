@@ -29,7 +29,7 @@ This pamphlet serves two purposes.
    explain what makes certain graph problems easy or hard.
 
 Every chapter in this brochure starts with an informal discussion about
-a concept from graph theory.  This informal exposition should be
+a concept from graph theory.  This informal introduction should be
 understandable by just about anybody interested enough to pick up this
 brochure from wherever it was found.
 
@@ -58,7 +58,7 @@ $v_2$.
 We will be completely abstract and say that we have a _set_ of _nodes_ and a
 set of _edges_, and that is it.
 
-[picture of graphs]
+![](assets/simple-graph.pdf)
 
 Often the edges, i.e. relationships, are _symmetric_.  That means that if $v_1,
 v_2$ is an edge, then necessarily $v_2 v_1$ is an edge.  For example consider
@@ -120,8 +120,11 @@ matrix_.
 
 The simplest form of a graph represented in code is the adjacency list:
 
-```python
+![](assets/simple-named-graph.pdf)
 
+
+\clearpage
+```python
 G = [
      [b],        # a
      [a, c, e],  # b
@@ -219,6 +222,8 @@ together with the distance.  The running time of BFS is $O(n+m)$, meaning
 _linear time_, meaning that it essentially takes as long time to run BFS as it
 takes to read the graph.
 
+\clearpage
+\scriptsize
 ```python
 from collections import deque
 
@@ -237,6 +242,8 @@ def bfs(G, s):
         queue.append(v)
   return dist, parent
 ```
+\normalsize
+\clearpage
 
 Suppose that you have a map, and your player is in the spawn area, and wants to
 find a route to the bomb site.  As long as your world has, for each coordinate,
@@ -285,6 +292,8 @@ everywhere; for example running in water or running uphill can be more
 expensive, we need an algorithm that can deal with these costs.  BFS can
 unfortunately not.
 
+![](assets/simple-weighted-graph.pdf)
+
 Dijkstra's algorithm is an SSSP (single source shortest path) algorithm that
 works similarly to BFS, but instead
 of a queue that we iterate through, we have a _priority queue_.  A priority
@@ -328,24 +337,29 @@ a 5 liter bucket with 4 liters of water using only 3 and 5 liter buckets.
 
 Suppose, we want to help MacClane with his task of putting 4 liters of water in a 5 liter bucket using only one 3 and one 5 liter buckets.
 Construct an abstract "state
-space graph" where you have the node set as $(c_3, c_5)$ where $c_3 \in \{0, 1,
-2, 3\}$ and $c_5 \in \{0, 1, 2, 3, 4, 5\}$.  Suppose that you have $c_3$ liters
-of water in the small bucket and $c_5$ liters of water in the large bucket.
-What can you do?  Fill one of them, i.e., the next states are $(3, c_5)$ or
-$(c_3, 5)$.  Alternatively, you can empty one of them, i.e., the next states
-are $(0, c_5$) or $(c_3, 0)$.  Finally, you can pour from one to the other
-until either pourer becomes empty or the pouree becomes full: $(\max(c_5 - c_3,
-0), \min(c_5 + c_3, 5))$, or the other way around.  How do we go from $(0,0)$ to
+space graph" where you have the node set as $(b_3, b_5)$ where $b_3 \in \{0, 1,
+2, 3\}$ and $b_5 \in \{0, 1, 2, 3, 4, 5\}$.  Suppose that you have $b_3$ liters
+of water in the small bucket and $b_5$ liters of water in the large bucket.
+What can you do?  Fill one of them, i.e., the next states are $(3, b_5)$ or
+$(b_3, 5)$.  Alternatively, you can empty one of them, i.e., the next states
+are $(0, b_5$) or $(b_3, 0)$.  Finally, you can pour from one to the other
+until either pourer becomes empty or the pouree becomes full: $(\max(b_5 - b_3,
+0), \min(b_5 + b_3, 5))$, or the other way around.  How do we go from $(0,0)$ to
 $(0, 4)$?  Simply run `bfs(G, (0,0))`.
 
+![](assets/water-jug.pdf)
+
 Let us denote the possible moves as follows
-$$ a\to 0\quad b\to 0\quad a\to b\quad b\to a\quad \infty \to a\quad \infty \to b, $$
-where $a \to 0$ means we empty the first bucket, $a\to b$ means me transfer content from $a$ to $b$ until either $a$ is empty or $b$ is full (whichever happens first), and $\infty \to a$ means we fill up $a$ (similarly with $a$ and $b$ swapped).
+$$ b_3\to 0\quad b_5\to 0\quad b_3\to b_5\quad b_5\to b_3\quad \infty \to b_3\quad \infty \to b_5, $$
+where $b_3 \to 0$ means we empty the first bucket,
+$b_3\to b_5$ means me transfer content from $b_3$ to $b_5$ until either $b_3$ is empty or $b_5$ is full
+(whichever happens first),
+and $\infty \to b_3$ means we fill up $b_3$ (similarly with $b_3$ and $b_5$ swapped).
+
+
 
 \clearpage
-
 \scriptsize
-
 ```python
 from collections import deque, namedtuple
 
@@ -678,11 +692,15 @@ an efficient algorithm.
 
 The aforementioned problem is called \textsc{Minimum Spanning Tree} (MST).
 You are given a graph, preferably with weights, and you want to find a
-_spanning tree_ in the graph, that is a _tree_ that contains all edges.
+_spanning tree_ in the graph, that is a _tree_ that contains all nodes.
 And out of all possible spanning trees, you want to find one which is as
 cheap as possible.  There are two famous algorithms for this problem,
 Prim's algorithm, which is Dijkstra's algorithm with simply this
 modification.
+
+
+![](assets/mst.pdf)
+
 
 ```diff
 15,16c15,16
@@ -725,26 +743,50 @@ nodes.  Meaning that you have _fewer_ houses than before.  The problem,
 however, is the same: Find the minimum network (in terms of electric cabling)
 possible that connects all houses to the power station.
 
+![](assets/steiner-tree.pdf)
 
 ## Travelling Salesman
 
-If you are standing on a location $A$ and want to reach a location $B$, we know
-what to do; shortest path.  However, what if you want to visit not one but two
-locations?  Well, either $ABC$ or $ACB$.  What if three locations?  Well,
-either one of $ABCD, ABDC, ACBD, ACDB, ADBC, ADCB$.  This set doesn't only grow
-_exponentially_, it grows _super-exponentially_: Like $n^n$, which is something
-like $n^{\log_2 n}$.
+If you are standing on a location $A$ and want to reach a location $B$,
+we know what to do; shortest path.
+However, what if you want to visit not one but two locations?
+Well, either ABC or ACB.
+What if three locations?
+Well, either one of ABCD, ABDC, ACBD, ACDB, ADBC, ADCB.
+Okay, now four locations?
+The possibilities are
+
+```
+ABCDE, ABCED, ABDCE, ABDEC,
+ABECD, ABEDC, ACBDE, ACBED,
+ACDBE, ACDEB, ACEBD, ACEDB,
+ADBCE, ADBEC, ADCBE, ADCEB,
+ADEBC, ADECB, AEBCD, AEBDC,
+AECBD, AECDB, AEDBC, AEDCB.
+```
+
+This set doesn't only grow _exponentially_, it
+grows _super-exponentially_: Like $n^n$, which is something like $2^{n
+\log_2 n}$.
 
 There is, however, an algorithm that solves the problem in time $2^nn^2$.  But
 before we look at Travelling Salesman, we'll look at a fundamental graph
 property, _hamiltonicity_.
 
+
+\clearpage
+
 ### Hamiltonian Path
 
-Is it possible to walk through your graph, visiting every vertex exactly once,
+Look at the following graph.
+
+![](assets/simple-large.pdf)
+
+Is it possible to walk through this graph, visiting every vertex exactly once,
 ending up in the same vertex you started in?  If so, the graph is
 _Hamiltonian_.  A Hamiltonian cycle is a simple cycle on $n$ vertices.  A
 Hamiltonian path is a simple path on $n$ vertices.
+
 
 The naïve algorithm for checking if a graph has a Hamiltonian path:
 
@@ -760,10 +802,13 @@ def hamiltonian_path(G):
   return any(DP[set(G.nodes, v)] for v in G.nodes)
 ```
 \normalsize
-\clearpage
+
+This is a Hamiltonian _path_, not a Hamiltonian cycle:
 
 
-### Travelling Salesman
+![](assets/simple-large-hamiltonian.pdf)
+
+### Travelling Salesman --- Revisited
 
 Travelling Salesman is basically the same problem as Hamiltonian path or cycle,
 except that you don't necessarily have to visit every node.  Suppose you have a
@@ -1026,6 +1071,8 @@ strategies dynamically.
 
 
 \clearpage
+
+\backmatter
 
 # Notes
 
