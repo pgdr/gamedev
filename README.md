@@ -1,6 +1,5 @@
 ---
 documentclass: book
-fontsize: 13pt
 title: Introduction to Graph Theory for Gamedevs
 author: Pål Grønås Drange
 date: Summer 2025
@@ -807,6 +806,14 @@ This is a Hamiltonian _path_, not a Hamiltonian cycle:
 
 
 ![](assets/simple-large-hamiltonian.pdf)
+
+This, however, is a proper Hamiltonian cycle, which shows that the graph indeed
+is Hamiltonian.
+
+![](assets/simple-large-hamiltonian-cycle.pdf)
+
+
+
 
 ### Travelling Salesman --- Revisited
 
