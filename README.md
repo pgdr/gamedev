@@ -863,17 +863,24 @@ Or you start and end in different nodes: Exactly two nodes have odd degree.
 
 That's it.
 
+\scriptsize
 ```python
-
+import networkx as nx
 def euler(G, v):
   while G[v]:
-    u = G[v][0]
-    G.remove(u, v)
-    euler(G, u)
-    yield v
+    u = next(iter(G[v]))
+    G.remove_edge(u, v)
+    yield from euler(G, u)
+  yield v
 
+G = nx.Graph()
+e = "ab ag bc be bg cd de ef eg fh hg"
+for u, v in e.split():
+  G.add_edge(u, v)
+
+print(" ".join(list(euler(G, "a"))))  # → a g h f e g b e d c b a
 ```
-
+\normalsize
 
 # Cutting and Flowing
 
