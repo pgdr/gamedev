@@ -57,7 +57,7 @@ $v_2$.
 We will be completely abstract and say that we have a _set_ of _nodes_ and a
 set of _edges_, and that is it.
 
-![](assets/simple-graph.pdf)
+![A simple graph](assets/simple-graph.pdf)
 
 Often the edges, i.e. relationships, are _symmetric_.  That means that if $v_1,
 v_2$ is an edge, then necessarily $v_2 v_1$ is an edge.  For example consider
@@ -119,7 +119,7 @@ matrix_.
 
 The simplest form of a graph represented in code is the adjacency list:
 
-![](assets/simple-named-graph.pdf)
+![A simple graph with letters for nodes](assets/simple-named-graph.pdf)
 
 
 \clearpage
@@ -291,7 +291,7 @@ everywhere; for example running in water or running uphill can be more
 expensive, we need an algorithm that can deal with these costs.  BFS can
 unfortunately not.
 
-![](assets/simple-weighted-graph.pdf)
+![A graph with weights on the edges](assets/simple-weighted-graph.pdf)
 
 Dijkstra's algorithm is an SSSP (single source shortest path) algorithm that
 works similarly to BFS, but instead
@@ -346,7 +346,7 @@ until either pourer becomes empty or the pouree becomes full: $(\max(b_5 - b_3,
 0), \min(b_5 + b_3, 5))$, or the other way around.  How do we go from $(0,0)$ to
 $(0, 4)$?  Simply run `bfs(G, (0,0))`.
 
-![](assets/water-jug.pdf)
+![Two jugs of water](assets/water-jug.pdf)
 
 Let us denote the possible moves as follows
 $$ b_3\to 0\quad b_5\to 0\quad b_3\to b_5\quad b_5\to b_3\quad \infty \to b_3\quad \infty \to b_5, $$
@@ -698,7 +698,7 @@ Prim's algorithm, which is Dijkstra's algorithm with simply this
 modification.
 
 
-![](assets/mst.pdf)
+![A spanning tree in a graph](assets/mst.pdf)
 
 
 ```diff
@@ -742,7 +742,7 @@ nodes.  Meaning that you have _fewer_ houses than before.  The problem,
 however, is the same: Find the minimum network (in terms of electric cabling)
 possible that connects all houses to the power station.
 
-![](assets/steiner-tree.pdf)
+![A Steiner Tree instance](assets/steiner-tree.pdf)
 
 ## Travelling Salesman
 
@@ -779,7 +779,7 @@ property, _hamiltonicity_.
 
 Look at the following graph.
 
-![](assets/simple-large.pdf)
+![Is this graph Hamiltonian?](assets/simple-large.pdf)
 
 Is it possible to walk through this graph, visiting every vertex exactly once,
 ending up in the same vertex you started in?  If so, the graph is
@@ -805,12 +805,12 @@ def hamiltonian_path(G):
 This is a Hamiltonian _path_, not a Hamiltonian cycle:
 
 
-![](assets/simple-large-hamiltonian.pdf)
+![A Hamiltonian **Path**](assets/simple-large-hamiltonian.pdf)
 
 This, however, is a proper Hamiltonian cycle, which shows that the graph indeed
 is Hamiltonian.
 
-![](assets/simple-large-hamiltonian-cycle.pdf)
+![The graph is indeed Hamiltonian](assets/simple-large-hamiltonian-cycle.pdf)
 
 
 
@@ -846,6 +846,15 @@ the graph formed by the dominoes adheres to specific conditions: either all
 vertices have an even degree, allowing for a closed loop, or exactly two
 vertices have an odd degree, permitting a path.
 
+![A graph with only even degrees: Draw all edges without lifting the
+pencil from the paper.  (Hint: Start and end at the same
+node.)](assets/euler-graph.pdf)
+
+![A graph with two odd nodes: Draw all edges without lifting the pencil
+from the paper.  (Hint: Start and end at the two odd
+nodes.)](assets/euler-graph-odd.pdf)
+
+
 This concept extends beyond dominoes into various game mechanics, such as
 drawing a figure without lifting your pencil from the paper.
 
@@ -854,7 +863,7 @@ through a door you get a bucket of gold and the door closes shut forever (with
 you on the other side).  Can you collect all the gold?
 
 
-### The algorithms:
+### The algorithm
 
 Two cases: Either you start and end in the same node.  Then you enter and exit
 each vertex the same number of times, hence check all degrees are even.
@@ -863,6 +872,7 @@ Or you start and end in different nodes: Exactly two nodes have odd degree.
 
 That's it.
 
+\clearpage
 \scriptsize
 ```python
 import networkx as nx
@@ -881,6 +891,7 @@ for u, v in e.split():
 print(" ".join(list(euler(G, "a"))))  # → a g h f e g b e d c b a
 ```
 \normalsize
+\clearpage
 
 # Cutting and Flowing
 
