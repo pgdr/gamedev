@@ -902,6 +902,8 @@ Let $G = (V, E, c)$ be a _weighted and directed_ graph, where $c: E \to
 this section, we will refer to $(G, s, t)$ as a _flow network_, and to confuse
 us a bit, we will compute the _network flow_ of the given _flow network_.
 
+![A flow network.  Water flowing into the leftmost node and coming out of the rightmost node.  With different capacities of each edge, the maximum possible flow varies.](assets/flow-network.pdf)
+
 Intuitively, the _flow_ of a network is easy to understand.  Suppose that you
 put a garden hose with _infinite_ water pressure and stick it into $s$, and you
 see poke a hole in $t$, to see how much water comes out of $t$ (per time unit).
