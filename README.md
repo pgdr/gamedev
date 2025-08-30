@@ -984,6 +984,42 @@ optimal, even in the weighted setting.
 
 # Covering, Hitting, and Packing
 
+## Covering Problems
+
+In this section, we will first discuss a problem known as \textsc{Dominating
+Set}.  Suppose that you again have a _tower defense_ game, and the game takes
+place on some kind of road network.  Your enemy can teleport to different
+intersections in your road network, and when they stand there, they will gather
+information.  You can place guards in intersections, and each guard can cover
+the intersection and all the directly neighboring intersections.  Where should
+we place the guards?
+
+This is the \textsc{Dominating Set} problem, and the problem is quite
+challenging to solve computationally, however there is a greedy algorithm that
+achieves a $\log n$-approximation.  For planar graphs, there is an $(1 +
+\epsilon)$-approximation.
+
+The \textsc{Dominating Set} problem aims to cover all neighborhoods $N(v)$ using vertices in $V$.
+
+The greedy algorithm is as follows:
+
+\scriptsize
+```python
+def greedy_domset(G):
+    V, D = set(G), set()
+    for _ in range(len(V)):
+        U = {v for v in G if not (({v} | set(G.neighbors(v))) & D)}
+        if not U: break
+        best, g = None, -1
+        for v in V - D:
+            s = len((({v} | set(G.neighbors(v))) & U))
+            if s > g: g, best = s, v
+        D.add(best)
+    return D
+```
+\normalsize
+
+
 * Problems
   * R-B-Dom Set, Vertex Cover, Tower defense
   * War defense, cutting-off
